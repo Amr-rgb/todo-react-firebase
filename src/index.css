@@ -1,4 +1,20 @@
 body {
   display: flex;
   justify-content: center;
+  text-align: center;
+}
+
+.app {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.todo__list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+  border: 1px solid lightgray;
+  margin-bottom: 10px !important;
 }

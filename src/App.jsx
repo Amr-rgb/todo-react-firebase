@@ -1,18 +1,33 @@
-import { useState } from "react";
-import { Button, FormControl, Input, InputLabel } from "@material-ui/core";
+import { useEffect, useState } from "react";
+import { Button, FormControl, Input, InputLabel } from "@mui/material";
 import { Todo } from "./components/Todo";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebase";
+import { query, orderBy, serverTimestamp, addDoc } from "firebase/firestore";
 
 function App() {
-  const [todos, setTodos] = useState([
-    "Make a react firebase project",
-    "Record a coding video",
-  ]);
+  const [todos, setTodos] = useState([]);
 
   const [input, setInput] = useState("");
 
-  const addTodo = (e) => {
+  useEffect(() => {
+    const todosRef = collection(db, "todos");
+    getDocs(query(todosRef, orderBy("timestamp", "desc"))).then((snapshot) => {
+      setTodos(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          item: doc.data(),
+        }))
+      );
+    });
+  }, [input]);
+
+  const addTodo = async (e) => {
     e.preventDefault();
-    setTodos([...todos, input]);
+    const todosRef = await addDoc(collection(db, "todos"), {
+      todo: input,
+      timestamp: serverTimestamp(),
+    });
     setInput("");
   };
 
@@ -37,8 +52,8 @@ function App() {
       </form>
 
       <ul>
-        {todos.map((todo) => (
-          <Todo todo={todo} />
+        {todos.map((item) => (
+          <Todo key={item.id} arr={item} setInput={setInput} />
         ))}
       </ul>
     </div>
